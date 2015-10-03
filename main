@@ -1,0 +1,134 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+#include <string.h>
+
+int syllable_count(char *myWord);
+int rhyme_index(char *wordA, char *wordB, int search_depth);
+
+int main()
+{
+    char startWord[100];
+    char line[100];
+    int syllables_per;
+    char *rhymes[1000];
+    int rhyme_loc =0;
+    srand (time(NULL));
+    FILE *myFile;
+    myFile = fopen("dictionary.txt", "r");
+    if (myFile == NULL)
+    {
+        fprintf(stderr, "Can't open input file in.list!\n");
+        exit(1);
+    }
+    printf("Please enter the seed word: ");
+    scanf("%s", &startWord[0]);
+    printf("Your word has %d syllables.\nPlease enter the number of syllables required: ", syllable_count(startWord));
+    scanf("%d", &syllables_per);
+    while (fscanf(myFile, "%s", line)!= EOF)
+    {
+        if (syllable_count(line) == syllables_per)
+        {
+          if (rhyme_index(startWord, line, 5) >= 3)
+            {
+                printf("%s \n", line);
+            }
+        }
+    }
+    return 0;
+}
+
+int syllable_count(char* myWord)
+{
+    int count = 0;
+    int i;
+    if (myWord[strlen(myWord)-1]=='e')
+    {
+        count --;
+    }
+    for (i = 0; i <= strlen(myWord); i++)
+    {
+        if (myWord[i] == 'a'||myWord[i] == 'e'||myWord[i] == 'i'||myWord[i] == 'o'||myWord[i] == 'u')
+        {
+            count ++;
+        }
+        if ((myWord[i] == 'a'&&myWord[i+1] == 'a')||(myWord[i] == 'a'&&myWord[i+1] == 'e')||(myWord[i] == 'a'&&myWord[i+1] == 'i')||(myWord[i] == 'a'&&myWord[i+1] == 'o')||(myWord[i] == 'a'&&myWord[i+1] == 'u'))
+        {
+            count --;
+        }
+        if ((myWord[i] == 'e'&&myWord[i+1] == 'a')||(myWord[i] == 'e'&&myWord[i+1] == 'e')||(myWord[i] == 'e'&&myWord[i+1] == 'i')||(myWord[i] == 'e'&&myWord[i+1] == 'o')||(myWord[i] == 'e'&&myWord[i+1] == 'u'))
+        {
+            count --;
+        }
+        if ((myWord[i] == 'i'&&myWord[i+1] == 'a')||(myWord[i] == 'i'&&myWord[i+1] == 'e')||(myWord[i] == 'i'&&myWord[i+1] == 'i')||(myWord[i] == 'i'&&myWord[i+1] == 'o')||(myWord[i] == 'i'&&myWord[i+1] == 'u'))
+        {
+            count --;
+        }
+        if ((myWord[i] == 'o'&&myWord[i+1] == 'a')||(myWord[i] == 'o'&&myWord[i+1] == 'e')||(myWord[i] == 'o'&&myWord[i+1] == 'i')||(myWord[i] == 'o'&&myWord[i+1] == 'o')||(myWord[i] == 'o'&&myWord[i+1] == 'u'))
+        {
+            count --;
+        }
+        if ((myWord[i] == 'u'&&myWord[i+1] == 'a')||(myWord[i] == 'u'&&myWord[i+1] == 'e')||(myWord[i] == 'u'&&myWord[i+1] == 'i')||(myWord[i] == 'u'&&myWord[i+1] == 'o')||(myWord[i] == 'u'&&myWord[i+1] == 'u'))
+        {
+            count --;
+        }
+    }
+
+    /*The Written Method Rules
+    Count the number of vowels (A, E, I, O, U) in the word.
+    Add 1 every time the letter 'y' makes the sound of a vowel (A, E, I, O, U).
+    Subtract 1 for each silent vowel (like the silent 'e' at the end of a word).
+
+    Subtract 1 for each diphthong or triphthong in the word.
+    Diphthong: when 2 vowels make only 1 sound (aw, oy, oo)
+    Triphthong: when 3 vowels make only 1 sound (iou)
+
+    Add 1 if the word ends with "le" or "les".
+
+    The number you are left with is the number of syllables in your word.*/
+    return count;
+}
+
+int rhyme_index(char *wordA, char *wordB,int search_depth)
+{
+    int count = 0;
+    int i;
+    if (strlen(wordA) > strlen(wordB))
+    {
+        if (strlen(wordB) < search_depth)
+        {
+            search_depth = strlen(wordB);
+        }
+    }
+    else
+    {
+        if (strlen(wordA) < search_depth)
+        {
+            search_depth = strlen(wordA);
+        }
+    }
+    for (i = 1; i <= search_depth; i ++)
+    {
+        if (i == 1)
+        {
+            if (wordA[strlen(wordA)-i] == wordB[strlen(wordB)-i])
+            {
+                count++;
+            }
+            else
+            {
+                break;
+            }
+
+        }
+        else
+        {
+            if (wordA[strlen(wordA)-i] == wordB[strlen(wordB)-i])
+            {
+                count++;
+            }
+        }
+    }
+    return count;
+}
